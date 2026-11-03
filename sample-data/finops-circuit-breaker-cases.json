@@ -16,3 +16,4 @@
   { "id": "T-15", "name": "Event Grid event Autonomous.CircuitBreakerTripped emitted upon trip", "eventDispatched": true, "expectedStatus": 200, "phase": "Unbounded Context & Quarantine" },
   { "id": "T-16", "name": "Entra ID app role revocation freezes subsequent calls with HTTP 401", "appRoleRevoked": true, "expectedStatus": 401, "phase": "Unbounded Context & Quarantine" }
 ]
+
