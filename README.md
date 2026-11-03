@@ -14,7 +14,7 @@ In enterprise multi-agent deployments, autonomous agents frequently delegate sub
 
 Without per-session velocity governors, a single recursive agent loop can exhaust a regional **240k TPM** or **1M TPM** Azure OpenAI deployment quota in under **90 seconds**—triggering cascading `HTTP 429 TooManyRequests` failures across unrelated business-critical applications sharing that AI Foundry endpoint while compounding unbudgeted consumption costs.
 
-![APIM GenAI Gateway Topology](diagrams/003-azure-stencil-apim-gateway-topology.png)
+![APIM GenAI Gateway Topology](diagrams/azure-stencil-apim-gateway-topology.png)
 
 ---
 
@@ -26,7 +26,7 @@ Without per-session velocity governors, a single recursive agent loop can exhaus
 | **Plane 2: Telemetry Sentinel** | Azure Monitor / Log Analytics + Cosmos DB | Rolling 60s token-burn derivative & cyclic tool hash | Detects recursive handoffs (`Depth > 4`) across multi-agent sessions |
 | **Plane 3: Identity Quarantine** | Microsoft Entra ID + Azure Event Grid | Automated Workload Identity token revocation | Isolates runaway agent principal while preserving sibling workloads |
 
-![Distributed Token Bucket Flow](diagrams/003-azure-stencil-token-bucket-data-flow.png)
+![Distributed Token Bucket Flow](diagrams/azure-stencil-token-bucket-data-flow.png)
 
 ---
 
@@ -74,5 +74,5 @@ Tests Passed: 16, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 ## 5. Author & Long-Form Evidence
 
 - **Author:** Shahrad Alerasoul — *Principal Azure Infrastructure & Platform Architect*
-- **Article Deep-Dive:** [https://alerasoul.net/003-autonomous-finops-quota-circuit-breaker/](https://alerasoul.net/003-autonomous-finops-quota-circuit-breaker/)
+- **Article Deep-Dive:** [https://alerasoul.net/autonomous-finops-quota-circuit-breaker/](https://alerasoul.net/autonomous-finops-quota-circuit-breaker/)
 - **License:** MIT License
