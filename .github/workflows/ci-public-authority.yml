@@ -44,11 +44,12 @@ jobs:
 
           $config = New-PesterConfiguration
           $config.Run.Path = $testFile
+          $config.Run.PassThru = $true
           $config.Output.Verbosity = "Detailed"
           $config.TestResult.Enabled = $true
           $config.TestResult.OutputPath = "./AuthorityGateResults.xml"
           
-          $result = Invoke-Pester -Configuration $config -PassThru
+          $result = Invoke-Pester -Configuration $config
           if ($result.FailedCount -gt 0) {
             Write-Error "Public Authority Governance Gate failed with $($result.FailedCount) failed checks!"
             exit 1
