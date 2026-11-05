@@ -1,0 +1,26 @@
+# http://editorconfig.org
+# Managed centrally by ShahradGH/sovereign-repo-conductor (Weekly Fleet Sync).
+# Do not edit or enable per-repo Dependabot.
+
+root = true
+
+[*]
+indent_style = space
+indent_size = 2
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.{ps1,psm1,psd1}]
+indent_size = 4
+
+[*.{cs,fs,vb}]
+indent_size = 4
+
+[*.md]
+trim_trailing_whitespace = false
+
+[Makefile]
+indent_style = tab
+
