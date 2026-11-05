@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+# Managed centrally by ShahradGH/sovereign-repo-conductor (Weekly Fleet Sync).
+# Do not edit or enable per-repo Dependabot.
+
+if command -v pwsh >/dev/null 2>&1; then
+    pwsh -NoProfile -ExecutionPolicy Bypass -File "$(dirname "$0")/gitleaks-pre-commit.ps1"
+elif command -v powershell.exe >/dev/null 2>&1; then
+    powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(dirname "$0")/gitleaks-pre-commit.ps1"
+else
+    echo "[Zero-Leak Hook] Warning: pwsh/powershell not found. Falling back to basic grep check."
+    if git diff --cached --unified=0 | grep -E "(mvpfoundry\.alerasoul\.net|192\.142\.41\.43)"; then
+        echo "[Zero-Leak Hook] CRITICAL: Leaked internal domain or VPS IP detected!"
+        exit 1
+    fi
+fi
+

@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+# Managed centrally by ShahradGH/sovereign-repo-conductor (Weekly Fleet Sync).
+# Do not edit or enable per-repo Dependabot.
+
+if command -v pwsh >/dev/null 2>&1; then
+    pwsh -NoProfile -ExecutionPolicy Bypass -File "$(dirname "$0")/gitleaks-pre-push.ps1" "$1" "$2"
+elif command -v powershell.exe >/dev/null 2>&1; then
+    powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(dirname "$0")/gitleaks-pre-push.ps1" "$1" "$2"
+else
+    echo "[Zero-Leak Hook] Warning: pwsh/powershell not found. Pre-push telemetry check skipped."
+fi

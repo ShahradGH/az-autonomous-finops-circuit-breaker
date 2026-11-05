@@ -1,0 +1,57 @@
+# Managed centrally by ShahradGH/sovereign-repo-conductor (Weekly Fleet Sync).
+# Do not edit or enable per-repo Dependabot.
+
+name: Public Authority Governance & Security Gate
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  authority-gate:
+    name: 16-Test Pester Gate & Zero-Leak Audit
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Setup PowerShell 7 & Pester 5+
+        shell: pwsh
+        run: |
+          Write-Host "Verifying PowerShell environment..."
+          $PSVersionTable
+          Import-Module Pester -MinimumVersion 5.0.0 -PassThru
+
+      - name: Run 16-Test Public Authority Gate
+        shell: pwsh
+        run: |
+          $testFile = "./tests/PublicAuthorityGate.Tests.ps1"
+          if (-not (Test-Path $testFile)) {
+            $testFile = "./PublicAuthorityGate.Tests.ps1"
+          }
+          if (-not (Test-Path $testFile)) {
+            Write-Error "PublicAuthorityGate.Tests.ps1 not found in repository root or tests/!"
+            exit 1
+          }
+
+          $config = New-PesterConfiguration
+          $config.Run.Path = $testFile
+          $config.Output.Verbosity = "Detailed"
+          $config.TestResult.Enabled = $true
+          $config.TestResult.OutputPath = "./AuthorityGateResults.xml"
+          
+          $result = Invoke-Pester -Configuration $config -PassThru
+          if ($result.FailedCount -gt 0) {
+            Write-Error "Public Authority Governance Gate failed with $($result.FailedCount) failed checks!"
+            exit 1
+          }
+          Write-Host "Public Authority Governance Gate: All 16 checks passed successfully!"
+
