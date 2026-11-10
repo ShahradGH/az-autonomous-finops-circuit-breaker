@@ -1,0 +1,165 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" width="1440" height="900" style="background:#0b1120; font-family:'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;">
+  <defs>
+    <linearGradient id="bgGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b1120"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <filter id="glow2" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+    <marker id="arrowB" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#38bdf8"/>
+    </marker>
+    <marker id="arrowG" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#34d399"/>
+    </marker>
+    <marker id="arrowR" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#ef4444"/>
+    </marker>
+  </defs>
+
+  <rect width="1440" height="900" fill="url(#bgGrad2)"/>
+  <rect x="0" y="0" width="1440" height="900" fill="none" stroke="#1e293b" stroke-width="1"/>
+
+  <!-- Header -->
+  <rect x="30" y="24" width="1380" height="76" rx="8" fill="#0f172a" stroke="#334155" stroke-width="1.5" filter="url(#glow2)"/>
+  <text x="60" y="55" fill="#f8fafc" font-size="20" font-weight="700">DISTRIBUTED TOKEN-BUCKET &amp; ANOMALY DATA FLOW</text>
+  <text x="60" y="80" fill="#94a3b8" font-size="13">Sub-Millisecond Policy Runtime Evaluation, Token Replenishment, and Circuit Breaker Trip Boundary</text>
+  <rect x="1220" y="44" width="160" height="34" rx="4" fill="#0369a1" fill-opacity="0.2" stroke="#0ea5e9" stroke-width="1"/>
+  <text x="1300" y="66" fill="#38bdf8" font-size="12" font-weight="600" text-anchor="middle">DATA &amp; CONTROL PLANE</text>
+
+  <!-- Step 1: Inbound Request Ingestion -->
+  <g transform="translate(30, 130)" filter="url(#glow2)">
+    <rect width="250" height="720" rx="8" fill="#0c1e38" stroke="#38bdf8" stroke-width="1.5"/>
+    <rect x="16" y="16" width="218" height="32" rx="4" fill="#0369a1"/>
+    <text x="125" y="38" fill="#ffffff" font-size="12" font-weight="700" text-anchor="middle">STAGE 1: AGENT CALL</text>
+
+    <text x="24" y="80" fill="#38bdf8" font-size="13" font-weight="700">Inbound REST Request</text>
+    <rect x="16" y="95" width="218" height="140" rx="4" fill="#0b1329" stroke="#1e293b"/>
+    <text x="26" y="120" fill="#cbd5e1" font-size="11">&#x2022; POST /openai/deployments/...</text>
+    <text x="26" y="142" fill="#cbd5e1" font-size="11">&#x2022; Bearer &lt;EntraID_JWT&gt;</text>
+    <text x="26" y="164" fill="#cbd5e1" font-size="11">&#x2022; x-agent-session-id: s-901</text>
+    <text x="26" y="186" fill="#cbd5e1" font-size="11">&#x2022; x-caller-depth: 3</text>
+    <text x="26" y="208" fill="#cbd5e1" font-size="11">&#x2022; Est. Tokens: ~1,450</text>
+
+    <text x="24" y="265" fill="#38bdf8" font-size="13" font-weight="700">Calling Context</text>
+    <rect x="16" y="280" width="218" height="200" rx="4" fill="#0b1329" stroke="#1e293b"/>
+    <text x="26" y="305" fill="#94a3b8" font-size="11">&#x2022; Orchestrator sub-task</text>
+    <text x="26" y="327" fill="#94a3b8" font-size="11">&#x2022; Tool: SAP Invoice Match</text>
+    <text x="26" y="349" fill="#94a3b8" font-size="11">&#x2022; Previous attempts: 2</text>
+    <text x="26" y="371" fill="#94a3b8" font-size="11">&#x2022; Velocity: 6 calls in 18s</text>
+    <text x="26" y="393" fill="#fbbf24" font-size="11">&#x2022; Approaching burn threshold</text>
+    <text x="26" y="415" fill="#94a3b8" font-size="11">&#x2022; Depth safe ceiling: 4</text>
+    <text x="26" y="437" fill="#34d399" font-size="11">&#x2714; Signed with Entra ID</text>
+  </g>
+
+  <!-- Step 2: Gateway Token-Bucket Evaluation -->
+  <g transform="translate(310, 130)" filter="url(#glow2)">
+    <rect width="280" height="720" rx="8" fill="#0f172a" stroke="#38bdf8" stroke-width="2"/>
+    <rect x="16" y="16" width="248" height="32" rx="4" fill="#1e3a5f"/>
+    <text x="140" y="38" fill="#ffffff" font-size="12" font-weight="700" text-anchor="middle">STAGE 2: TOKEN BUCKET</text>
+
+    <text x="24" y="80" fill="#38bdf8" font-size="13" font-weight="700">APIM Token Counter</text>
+    <rect x="16" y="95" width="248" height="260" rx="4" fill="#0b1329" stroke="#1e293b"/>
+    <text x="26" y="120" fill="#cbd5e1" font-size="11">&#x2022; Counter Key: sess-s-901</text>
+    <text x="26" y="142" fill="#cbd5e1" font-size="11">&#x2022; Bucket Capacity: 18,000</text>
+    <text x="26" y="164" fill="#cbd5e1" font-size="11">&#x2022; Refill Rate: 300 tokens/sec</text>
+    <text x="26" y="186" fill="#cbd5e1" font-size="11">&#x2022; Current Bucket: 4,200 tokens</text>
+    <text x="26" y="208" fill="#cbd5e1" font-size="11">&#x2022; Request Cost: 1,450 tokens</text>
+    <rect x="26" y="225" width="228" height="50" rx="4" fill="#1e293b"/>
+    <text x="36" y="248" fill="#34d399" font-size="11" font-weight="600">Decision: 4,200 &gt; 1,450</text>
+    <text x="36" y="266" fill="#38bdf8" font-size="10.5">Bucket Balance: 2,750 left</text>
+    <text x="26" y="300" fill="#cbd5e1" font-size="11">&#x2022; Execution Time: 1.4ms</text>
+    <text x="26" y="322" fill="#34d399" font-size="11" font-weight="600">&#x2714; DISPATCH PERMITTED</text>
+
+    <!-- Over-Quota Branch -->
+    <text x="24" y="390" fill="#ef4444" font-size="13" font-weight="700">Over-Quota Branch (Trip)</text>
+    <rect x="16" y="405" width="248" height="270" rx="4" fill="#1a0c10" stroke="#7f1d1d"/>
+    <text x="26" y="430" fill="#fca5a5" font-size="11">&#x2022; If Bucket &lt; Request Tokens:</text>
+    <text x="26" y="452" fill="#fca5a5" font-size="11">&#x2022; Return HTTP 429 immediately</text>
+    <text x="26" y="474" fill="#fca5a5" font-size="11">&#x2022; Latency: &lt; 2 milliseconds</text>
+    <text x="26" y="496" fill="#fca5a5" font-size="11">&#x2022; Header: Retry-After: 42</text>
+    <text x="26" y="518" fill="#fca5a5" font-size="11">&#x2022; Zero backend model compute hit</text>
+    <text x="26" y="540" fill="#fca5a5" font-size="11">&#x2022; Zero cloud quota drained</text>
+    <text x="26" y="562" fill="#fca5a5" font-size="11">&#x2022; Emits APIM Throttle Metric</text>
+    <rect x="26" y="585" width="228" height="65" rx="4" fill="#2d1215"/>
+    <text x="36" y="608" fill="#ef4444" font-size="11" font-weight="600">🛑 CIRCUIT TRIP</text>
+    <text x="36" y="628" fill="#fca5a5" font-size="10.5">Session throttled at edge</text>
+  </g>
+
+  <!-- Step 3: Backend Model Execution -->
+  <g transform="translate(620, 130)" filter="url(#glow2)">
+    <rect width="280" height="720" rx="8" fill="#07203d" stroke="#0ea5e9" stroke-width="1.5"/>
+    <rect x="16" y="16" width="248" height="32" rx="4" fill="#0284c7"/>
+    <text x="140" y="38" fill="#ffffff" font-size="12" font-weight="700" text-anchor="middle">STAGE 3: MODEL COMPUTE</text>
+
+    <text x="24" y="80" fill="#38bdf8" font-size="13" font-weight="700">Azure OpenAI Execution</text>
+    <rect x="16" y="95" width="248" height="260" rx="4" fill="#0b1329" stroke="#1e293b"/>
+    <text x="26" y="120" fill="#cbd5e1" font-size="11">&#x2022; Endpoint: foundry-gpt4o.openai</text>
+    <text x="26" y="142" fill="#cbd5e1" font-size="11">&#x2022; Auth: Managed Identity VNet</text>
+    <text x="26" y="164" fill="#cbd5e1" font-size="11">&#x2022; Model: gpt-4o-2024-08-06</text>
+    <text x="26" y="186" fill="#cbd5e1" font-size="11">&#x2022; Tokens Used: 1,380</text>
+    <text x="26" y="208" fill="#cbd5e1" font-size="11">&#x2022; Prompt: 1,120 / Compl: 260</text>
+    <text x="26" y="230" fill="#cbd5e1" font-size="11">&#x2022; Latency: 640ms</text>
+    <text x="26" y="252" fill="#34d399" font-size="11">&#x2714; HTTP 200 OK Returned</text>
+    <rect x="26" y="275" width="228" height="55" rx="4" fill="#1e293b"/>
+    <text x="36" y="298" fill="#38bdf8" font-size="11" font-weight="600">Actual Token Reconciliation:</text>
+    <text x="36" y="316" fill="#94a3b8" font-size="10.5">Bucket credited back 70 tokens</text>
+
+    <text x="24" y="390" fill="#38bdf8" font-size="13" font-weight="700">Response Headers Attached</text>
+    <rect x="16" y="405" width="248" height="270" rx="4" fill="#0b1329" stroke="#1e293b"/>
+    <text x="26" y="430" fill="#cbd5e1" font-size="11">&#x2022; x-ratelimit-remaining-tokens</text>
+    <text x="26" y="452" fill="#cbd5e1" font-size="11">&#x2022; x-ratelimit-limit-tokens: 18k</text>
+    <text x="26" y="474" fill="#cbd5e1" font-size="11">&#x2022; x-ms-client-session: s-901</text>
+    <text x="26" y="496" fill="#cbd5e1" font-size="11">&#x2022; traceparent: 00-7f2a...-01</text>
+    <text x="26" y="518" fill="#34d399" font-size="11">&#x2714; Clean execution cycle</text>
+    <rect x="26" y="540" width="228" height="110" rx="4" fill="#1e293b"/>
+    <text x="36" y="565" fill="#38bdf8" font-size="11" font-weight="600">Enterprise SLA:</text>
+    <text x="36" y="585" fill="#94a3b8" font-size="10.5">&#x2022; Zero latency penalty on pass</text>
+    <text x="36" y="605" fill="#94a3b8" font-size="10.5">&#x2022; Deterministic policy budget</text>
+    <text x="36" y="625" fill="#94a3b8" font-size="10.5">&#x2022; Cost allocation precision</text>
+  </g>
+
+  <!-- Step 4: Forensic Anomaly Sentinel & Auto-Quarantine -->
+  <g transform="translate(930, 130)" filter="url(#glow2)">
+    <rect width="480" height="720" rx="8" fill="#1e1b4b" stroke="#818cf8" stroke-width="2"/>
+    <rect x="16" y="16" width="448" height="32" rx="4" fill="#4338ca"/>
+    <text x="240" y="38" fill="#ffffff" font-size="12" font-weight="700" text-anchor="middle">STAGE 4: KQL SENTINEL &amp; AUTO-QUARANTINE</text>
+
+    <text x="24" y="80" fill="#a5b4fc" font-size="13" font-weight="700">Real-Time Forensic KQL Analysis</text>
+    <rect x="16" y="95" width="448" height="230" rx="4" fill="#0b1120" stroke="#312e81"/>
+    <text x="26" y="120" fill="#c7d2fe" font-size="11" font-weight="600">AzureDiagnostics | where TimeGenerated &gt; ago(5m)</text>
+    <text x="26" y="140" fill="#94a3b8" font-size="10.5">| summarize CallCount = count(), TotalTokens = sum(Tokens)</text>
+    <text x="26" y="158" fill="#94a3b8" font-size="10.5">  Throttle429Count = countif(responseCode_d == 429)</text>
+    <text x="26" y="176" fill="#94a3b8" font-size="10.5">  by SessionId, AgentOid, bin(TimeGenerated, 1m)</text>
+    <text x="26" y="196" fill="#ef4444" font-size="11" font-weight="600">| where CallCount &gt; 12 or TotalTokens &gt; 18000 or Throttle429Count &gt; 0</text>
+    <text x="26" y="216" fill="#fbbf24" font-size="11">| project Action = "🛑 TRIP CIRCUIT BREAKER &amp; QUARANTINE"</text>
+    <rect x="26" y="235" width="428" height="70" rx="4" fill="#18182b"/>
+    <text x="36" y="258" fill="#ef4444" font-size="11" font-weight="600">Anomaly Signature Detected:</text>
+    <text x="36" y="278" fill="#fca5a5" font-size="10.5">Recursive retry pattern: 14 calls in 52 seconds (Depth 5 loop)</text>
+
+    <text x="24" y="360" fill="#a5b4fc" font-size="13" font-weight="700">Autonomous Quarantine &amp; Blast Radius Containment</text>
+    <rect x="16" y="375" width="448" height="300" rx="4" fill="#0b1120" stroke="#312e81"/>
+    <text x="26" y="402" fill="#c7d2fe" font-size="11" font-weight="600">1. Autonomous Kill-Switch Trigger:</text>
+    <text x="26" y="422" fill="#94a3b8" font-size="10.5">&#x2022; Emits Event Grid: Microsoft.Foundry.CircuitBreakerTripped</text>
+    <text x="26" y="442" fill="#94a3b8" font-size="10.5">&#x2022; Payload: { sessionId, agentOid, burnVelocity, tripReason }</text>
+
+    <text x="26" y="472" fill="#c7d2fe" font-size="11" font-weight="600">2. Identity Quarantine (Entra ID):</text>
+    <text x="26" y="492" fill="#94a3b8" font-size="10.5">&#x2022; Calls Microsoft Graph v2.x to revoke AppRoleAssignment</text>
+    <text x="26" y="512" fill="#94a3b8" font-size="10.5">&#x2022; Subsequent tokens from agent principal rejected (401)</text>
+
+    <text x="26" y="542" fill="#c7d2fe" font-size="11" font-weight="600">3. Operational Notification:</text>
+    <text x="26" y="562" fill="#94a3b8" font-size="10.5">&#x2022; Posts forensic card to Teams #platform-finops-alerts</text>
+    <text x="26" y="582" fill="#94a3b8" font-size="10.5">&#x2022; Contains exact loop depth, token waste, and restart command</text>
+
+    <rect x="26" y="605" width="428" height="55" rx="4" fill="#18182b"/>
+    <text x="36" y="628" fill="#34d399" font-size="11" font-weight="600">&#x2714; Sibling Workloads 100% Unaffected</text>
+    <text x="36" y="646" fill="#94a3b8" font-size="10.5">Mean Time to Containment (MTTC): 7.8 seconds</text>
+  </g>
+
+  <!-- Connectors -->
+  <line x1="280" y1="200" x2="310" y2="200" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrowB)"/>
+  <line x1="590" y1="200" x2="620" y2="200" stroke="#34d399" stroke-width="2" marker-end="url(#arrowG)"/>
+  <path d="M 590 540 L 910 540 L 910 240 L 930 240" fill="none" stroke="#ef4444" stroke-width="2" marker-end="url(#arrowR)"/>
+  <line x1="900" y1="200" x2="930" y2="200" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrowB)"/>
+</svg>

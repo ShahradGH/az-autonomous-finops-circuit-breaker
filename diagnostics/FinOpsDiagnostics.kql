@@ -1,0 +1,50 @@
+// =============================================================================
+// Forensic KQL Sentinel: Detecting High-Velocity Recursive Agent Tool Storms
+// Repository: https://github.com/ShahradGH/az-autonomous-finops-circuit-breaker
+// Telemetry Target: Azure Monitor / Log Analytics (ApiManagementGatewayLogs)
+// Cadence: Rolling 5-minute window evaluated every 60 seconds
+// =============================================================================
+
+// Query 1: Detect multi-agent sessions exceeding safe token velocity or exhibiting cyclic retries
+AzureDiagnostics
+| where ResourceProvider == "MICROSOFT.APIMANAGEMENT"
+| where TimeGenerated > ago(5m)
+| extend RequestHeaders = parse_json(requestHeaders_s)
+| extend SessionId = tostring(coalesce(RequestHeaders["x-agent-session-id"], "unknown-session"))
+| extend AgentOid = tostring(coalesce(RequestHeaders["x-ms-client-principal-id"], "unknown-agent"))
+| extend CallerDepth = toint(coalesce(RequestHeaders["x-caller-depth"], "1"))
+| summarize 
+    CallCount = count(),
+    TotalPromptTokens = sum(toint(customDimensions_PromptTokens_d)),
+    TotalCompletionTokens = sum(toint(customDimensions_CompletionTokens_d)),
+    Throttle429Count = countif(responseCode_d == 429),
+    MaxDepth = max(CallerDepth)
+    by SessionId, AgentOid, bin(TimeGenerated, 1m)
+| extend TotalTokensPerMin = TotalPromptTokens + TotalCompletionTokens
+| where CallCount > 12 or TotalTokensPerMin > 18000 or Throttle429Count > 0 or MaxDepth > 4
+| project 
+    TimeGenerated, 
+    SessionId, 
+    AgentOid, 
+    CallCount, 
+    TotalTokensPerMin, 
+    Throttle429Count, 
+    MaxDepth,
+    RiskClassification = case(
+        MaxDepth > 4, "CRITICAL: Cyclic Recursion Loop",
+        TotalTokensPerMin > 18000, "HIGH: Token Velocity Breach",
+        Throttle429Count > 2, "MEDIUM: Sustained 429 Cascades",
+        "ELEVATED: Burst Velocity"
+    ),
+    Action = "🛑 TRIP CIRCUIT BREAKER & DISPATCH EVENT GRID QUARANTINE"
+
+// Query 2: Rolling 60-Second Token Consumption by Workload Identity (Cost Attribution)
+AzureMetrics
+| where ResourceProvider == "MICROSOFT.COGNITIVESERVICES"
+| where MetricName in ("ProcessedPromptTokens", "GeneratedTokens")
+| where TimeGenerated > ago(1h)
+| summarize 
+    TotalTokens = sum(Total),
+    AvgTokensPerMin = avg(Total)
+    by bin(TimeGenerated, 5m), Resource
+| order by TimeGenerated desc

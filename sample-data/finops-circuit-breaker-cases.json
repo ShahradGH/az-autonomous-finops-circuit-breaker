@@ -1,0 +1,19 @@
+[
+  { "id": "T-01", "name": "Single-pass summarization under 2,000 tokens", "tokens": 1850, "depth": 1, "expectedStatus": 200, "phase": "Permitted Workloads" },
+  { "id": "T-02", "name": "Parallel dual sub-agent call (2x 3,500 tokens)", "tokens": 7000, "depth": 2, "expectedStatus": 200, "phase": "Permitted Workloads" },
+  { "id": "T-03", "name": "RAG search retrieval with 8,000 token chunked context", "tokens": 8000, "depth": 1, "expectedStatus": 200, "phase": "Permitted Workloads" },
+  { "id": "T-04", "name": "Structured JSON output generation with 4,200 tokens", "tokens": 4200, "depth": 2, "expectedStatus": 200, "phase": "Permitted Workloads" },
+  { "id": "T-05", "name": "Multi-agent orchestrator handoff at Depth 2", "tokens": 5100, "depth": 2, "expectedStatus": 200, "phase": "Permitted Workloads" },
+  { "id": "T-06", "name": "High-frequency burst of 5 calls within 30 seconds (< 12 RPM)", "tokens": 3200, "depth": 1, "callRate": 10, "expectedStatus": 200, "phase": "Permitted Workloads" },
+  { "id": "T-07", "name": "Token-bucket balance replenishment verified across 60-second window", "tokens": 18000, "depth": 1, "refillRatePerSec": 300, "expectedStatus": 200, "phase": "Permitted Workloads" },
+  { "id": "T-08", "name": "FinOps custom dimensions emitted with valid Entra ID Object ID", "agentOid": "oid-49a8-e42b-91f0", "expectedStatus": 200, "phase": "Permitted Workloads" },
+  { "id": "T-09", "name": "Cyclic Planner to Executor recursion at Depth 5", "tokens": 12000, "depth": 5, "expectedStatus": 429, "phase": "Recursive Handoff Loops" },
+  { "id": "T-10", "name": "Rapid retry loop with 14 calls in 45 seconds (> 12 RPM)", "tokens": 9800, "callRate": 18, "expectedStatus": 429, "phase": "Recursive Handoff Loops" },
+  { "id": "T-11", "name": "Malformed tool schema error triggering infinite loop halted at Depth 5", "tokens": 11000, "depth": 5, "expectedStatus": 429, "phase": "Recursive Handoff Loops" },
+  { "id": "T-12", "name": "Circuit breaker trip attaches Retry-After: 60 header", "retryAfterSeconds": 60, "expectedStatus": 429, "phase": "Recursive Handoff Loops" },
+  { "id": "T-13", "name": "Unchunked document payload of 24,000 tokens trips 18k TPM session limit", "tokens": 24000, "limit": 18000, "expectedStatus": 429, "phase": "Unbounded Context & Quarantine" },
+  { "id": "T-14", "name": "Shared regional 240k TPM pool preserved while offending session is quarantined", "regionalPoolDrained": false, "sessionIsolated": true, "expectedStatus": 429, "phase": "Unbounded Context & Quarantine" },
+  { "id": "T-15", "name": "Event Grid event Autonomous.CircuitBreakerTripped emitted upon trip", "eventDispatched": true, "expectedStatus": 200, "phase": "Unbounded Context & Quarantine" },
+  { "id": "T-16", "name": "Entra ID app role revocation freezes subsequent calls with HTTP 401", "appRoleRevoked": true, "expectedStatus": 401, "phase": "Unbounded Context & Quarantine" }
+]
+

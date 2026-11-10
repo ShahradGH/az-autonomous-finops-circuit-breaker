@@ -1,0 +1,15 @@
+# System & Editor
+.DS_Store
+Thumbs.db
+*.tmp
+*.log
+.vscode/
+.idea/
+
+# Node & Package Managers
+node_modules/
+package-lock.json
+
+# Test Artifacts
+TestResults/
+*.trx

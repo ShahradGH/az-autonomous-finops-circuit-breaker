@@ -1,0 +1,82 @@
+<!--
+    Azure API Management (APIM) GenAI Gateway Policy
+    Repository: https://github.com/ShahradGH/az-autonomous-finops-circuit-breaker
+    Purpose: Token-Bucket Rate Limiter & Circuit Breaker for Multi-Agent Foundry Workloads
+-->
+<policies>
+    <inbound>
+        <base />
+
+        <!-- 1. Enforce Entra ID Workload Identity Authentication -->
+        <validate-azure-ad-token tenant-id="{{entra-tenant-id}}" failed-validation-httpcode="401" failed-validation-error-message="Unauthorized: Invalid Workload Identity Token">
+            <audiences>
+                <audience>api://foundry-ai-gateway</audience>
+            </audiences>
+            <required-claims>
+                <claim name="roles" match="any">
+                    <value>Foundry.Agent.Execute</value>
+                    <value>Foundry.Agent.Orchestrator</value>
+                </claim>
+            </required-claims>
+        </validate-azure-ad-token>
+
+        <!-- 2. Extract Correlation Headers & Caller Workload Identity -->
+        <set-variable name="agentObjectId" value="@(context.Request.Headers.GetValueOrDefault("Authorization","").AsJwt()?.Claims.GetValueOrDefault("oid", "anonymous-agent"))" />
+        <set-variable name="sessionId" value="@(context.Request.Headers.GetValueOrDefault("x-agent-session-id", "default-session"))" />
+        <set-variable name="callerDepth" value="@(context.Request.Headers.GetValueOrDefault("x-caller-depth", "1"))" />
+
+        <!-- 3. Fail-Fast: Reject Deep Recursive Tool Loops (Depth > 4) -->
+        <choose>
+            <when condition="@(int.Parse((string)context.Variables["callerDepth"]) > 4)">
+                <return-response>
+                    <set-status code="429" reason="Too Many Requests - Recursive Depth Breached" />
+                    <set-header name="Retry-After" exists-action="override">
+                        <value>60</value>
+                    </set-header>
+                    <set-header name="x-circuit-breaker-reason" exists-action="override">
+                        <value>RECURSIVE_DEPTH_EXCEEDED</value>
+                    </set-header>
+                    <set-body>@{
+                        return new Newtonsoft.Json.Linq.JObject(
+                            new Newtonsoft.Json.Linq.JProperty("error", "CIRCUIT_BREAKER_TRIPPED"),
+                            new Newtonsoft.Json.Linq.JProperty("message", "Agent recursion depth limit exceeded (Depth > 4). Execution frozen to protect quota."),
+                            new Newtonsoft.Json.Linq.JProperty("sessionId", (string)context.Variables["sessionId"]),
+                            new Newtonsoft.Json.Linq.JProperty("agentObjectId", (string)context.Variables["agentObjectId"]),
+                            new Newtonsoft.Json.Linq.JProperty("action", "TRIP_CIRCUIT_BREAKER")
+                        ).ToString();
+                    }</set-body>
+                </return-response>
+            </when>
+        </choose>
+
+        <!-- 4. Distributed Token-Bucket Governor: 18,000 TPM per Session -->
+        <azure-openai-token-limit
+            counter-key="@((string)context.Variables["sessionId"])"
+            tokens-per-minute="18000"
+            estimate-prompt-tokens="true"
+            remaining-tokens-header-name="x-ratelimit-remaining-tokens" />
+
+        <!-- 5. Emit Real-Time Telemetry & FinOps Dimensions -->
+        <azure-openai-emit-token-metric namespace="FoundryFinOps">
+            <dimension name="AgentObjectId" value="@((string)context.Variables["agentObjectId"])" />
+            <dimension name="SessionId" value="@((string)context.Variables["sessionId"])" />
+            <dimension name="ModelDeployment" value="@(context.Request.MatchedParameters.GetValueOrDefault("deployment-id", "gpt-4o"))" />
+        </azure-openai-emit-token-metric>
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+        <!-- Propagate FinOps Tracing Headers -->
+        <set-header name="x-agent-session-id" exists-action="override">
+            <value>@((string)context.Variables["sessionId"])</value>
+        </set-header>
+        <set-header name="x-governance-plane" exists-action="override">
+            <value>Foundry-FinOps-Gateway-v1</value>
+        </set-header>
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>

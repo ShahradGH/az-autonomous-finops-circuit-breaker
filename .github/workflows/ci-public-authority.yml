@@ -1,0 +1,14 @@
+name: Pester Architecture Verification
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+jobs:
+  pester:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Pester Suite
+        shell: pwsh
+        run: Invoke-Pester -Path ./tests -Output Detailed
