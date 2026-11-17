@@ -1,0 +1,32 @@
+name: Zero-Sprawl Security Gate
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  security-gate:
+    name: Semgrep + Trivy Gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7.0.1
+
+      - name: Run Semgrep SAST (ERROR severity)
+        run: |
+          python3 -m pip install --quiet semgrep
+          semgrep scan --config p/default --severity ERROR --error --exclude .githooks .
+
+      - name: Run Trivy (CRITICAL fixable vuln & misconfig)
+        run: |
+          TRIVY_VER=$(curl -sf https://api.github.com/repos/aquasecurity/trivy/releases/latest | jq -r '.tag_name | ltrimstr("v")')
+          curl -sfL "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VER}/trivy_${TRIVY_VER}_Linux-64bit.tar.gz" -o /tmp/trivy.tar.gz
+          tar -xzf /tmp/trivy.tar.gz -C /tmp trivy
+          sudo mv /tmp/trivy /usr/local/bin/trivy
+          trivy fs --scanners vuln,misconfig --severity CRITICAL --ignore-unfixed --exit-code 1 .
